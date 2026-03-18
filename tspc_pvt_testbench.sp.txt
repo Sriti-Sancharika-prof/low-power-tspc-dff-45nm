@@ -1,0 +1,47 @@
+* ==========================================================
+* TSPC D Flip-Flop PVT Characterization Testbench
+* Technology : 45nm CMOS
+* Tool       : LTspice
+* Description: Clock-to-Q delay, power and noise analysis
+* ==========================================================
+
+* ----- Parameters and PVT sweep -----
+.param SUPPLY=0.5
+; .step param SUPPLY LIST 0.25 0.30 0.35 0.40 0.45 0.50
+.temp -40 27 85
+
+* ----- Supply Source -----
+Vdd Vdd 0 DC {SUPPLY}
+
+* ----- Input Stimulus -----
+Vclk CLK 0 PULSE(0 {SUPPLY} 0 10p 10p 50n 100n)
+Vd   D   0 PULSE(0 {SUPPLY} 50n 10p 10p 100n 200n)
+
+* ----- Measurement Helpers -----
+.param mid = {SUPPLY/2}
+
+* Clock-to-Q delay
+.meas TRAN tpdr TRIG V(CLK) VAL={mid} RISE=1 FROM=0 TO=2u TARG V(OUT) VAL={mid} RISE=1
+.meas TRAN tpdf TRIG V(CLK) VAL={mid} FALL=1 FROM=0 TO=2u TARG V(OUT) VAL={mid} FALL=1
+.meas TRAN tpd PARAM = (tpdr + tpdf)/2
+
+* Output transition times
+.meas TRAN tr_10_90 TRIG V(OUT) VAL={0.1*SUPPLY} RISE=1 FROM=0 TO=2u TARG V(OUT) VAL={0.9*SUPPLY} RISE=1
+.meas TRAN tf_90_10 TRIG V(OUT) VAL={0.9*SUPPLY} FALL=1 FROM=0 TO=2u TARG V(OUT) VAL={0.1*SUPPLY} FALL=1
+
+* Output voltage levels and power
+.meas TRAN Vout_max MAX V(OUT) FROM=0 TO=2u
+.meas TRAN Vout_min MIN V(OUT) FROM=0 TO=2u
+.meas TRAN Iavg AVG I(Vdd) FROM=0 TO=2u
+.meas TRAN Pavg PARAM = abs(Iavg*SUPPLY)
+
+* ----- Models -----
+.include 45nmHP.txt
+
+* ----- Noise Analysis -----
+.noise V(OUT) Vd oct 100 100 10Meg
+
+* ----- Transient Analysis -----
+.tran 0 2u 0 10p
+
+.end
