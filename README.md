@@ -117,11 +117,10 @@ An **optimal operating region** exists where meaningful power savings can be ach
 
 ## Project Files
 
-* SPICE netlist for PVT sweep
 * Layout and schematic images
 * Post-layout waveform plots
 * Timing and power measurement data
-
+* tspc_pvt_testbench.sp
 ---
 
 ## Future Improvements
