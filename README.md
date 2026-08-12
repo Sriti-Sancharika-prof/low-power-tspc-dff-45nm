@@ -1,133 +1,159 @@
-# low-power-tspc-dff-45nm
-Post-layout timing, power and PVT analysis of a low-power True Single Phase Clock (TSPC) D Flip-Flop in 45nm CMOS.
-# Low Power True Single Phase Clock (TSPC) D Flip-Flop — Near Threshold Analysis (45nm)
+# Low-Power TSPC D Flip-Flop — 45 nm CMOS
+
+Transistor-level design, full-custom layout, post-layout analysis, and PVT characterization of a low-power True Single Phase Clock (TSPC) D Flip-Flop in 45 nm CMOS.
 
 ## Overview
 
-This project presents the transistor-level design, physical layout implementation, and post-layout performance characterisation of a True Single Phase Clock (TSPC) D Flip-Flop in 45nm CMOS technology. The primary objective is to evaluate the behaviour of dynamic sequential logic under near-threshold voltage operation and analyze associated trade-offs in timing performance, output voltage swing, noise susceptibility, and power consumption.
+This project focuses on understanding the behavior of dynamic sequential logic under low-voltage operation and evaluating the trade-offs between power, timing, output swing, and reliability.
 
-Dynamic flip-flops play a critical role in determining the speed and energy efficiency of modern synchronous digital systems. This work focuses on understanding the practical limitations and design considerations required for reliable ultra-low power sequential circuit operation.
-
----
+The TSPC D flip-flop was designed at the transistor level, followed by full-custom layout, parasitic extraction, post-layout simulation, and PVT characterization across supply voltage and temperature variations.
 
 ## Design Flow
 
-The complete design methodology follows a structured VLSI implementation flow:
+The project follows a complete custom CMOS design flow:
 
-1. **Transistor-Level Design and Functional Verification**
+1. **Transistor-Level Design**
+   - Designed the TSPC D flip-flop using 45 nm CMOS device models.
+   - Performed transient simulations in LTspice to verify clock-controlled data storage.
+   - Evaluated operation across reduced supply voltages.
 
-   * Circuit designed and simulated in LTspice using 45nm device models.
-   * Transient simulations performed to verify clock-controlled data latching behavior.
-   * Supply voltage scaling explored to identify near-threshold operational limits.
+2. **Full-Custom Layout**
+   - Implemented the circuit layout using Electric VLSI.
+   - Applied CMOS design rules for device placement and routing.
+   - Optimized power routing and sensitive dynamic nodes to reduce parasitic loading.
 
-2. **Layout Implementation**
+3. **Parasitic Extraction**
+   - Extracted parasitic capacitances from the layout.
+   - Incorporated extracted parasitics into post-layout simulations.
+   - Evaluated their impact on timing and signal integrity.
 
-   * Full custom layout developed in Electric VLSI.
-   * Standard CMOS design rules followed for device placement and routing.
-   * Power rails widened to reduce IR drop and improve supply integrity.
-   * Critical dynamic nodes routed carefully to minimize parasitic loading.
+4. **Post-Layout Analysis**
+   - Compared functional behavior before and after parasitic extraction.
+   - Analyzed clock-to-Q delay, output voltage swing, and transient behavior.
 
-3. **Parasitic Extraction and Post-Layout Simulation**
+5. **PVT Characterization**
+   - Supply voltage: **0.25 V – 0.5 V**
+   - Temperature corners: **−40°C, 27°C, 85°C**
+   - Characterized:
+     - Clock-to-Q delay
+     - Output voltage swing
+     - Rise and fall time
+     - Average power consumption
 
-   * Extracted parasitic capacitances incorporated into simulation netlist.
-   * Post-layout transient simulations performed to evaluate realistic timing degradation and signal integrity.
+## Design Results
 
-4. **PVT Characterization**
+### Schematic
 
-   * Supply voltage sweep: **0.25 V – 0.5 V**
-   * Temperature corners: **−40°C, 27°C, 85°C**
-   * Key parameters measured:
+![TSPC DFF Schematic](tspc_dff_schematic_45nm.png)
 
-     * Clock-to-Q delay
-     * Output voltage swing
-     * Rise/Fall time
-     * Average power consumption
+### Full-Custom Layout
 
----
+![TSPC DFF Layout](tspc_dff_layout_45nm.png)
+
+### Functional Verification
+
+![Functional Transient Waveform](tspc_functional_transient_waveform.png)
+
+The transient response was analyzed to verify the data-latching behavior of the TSPC flip-flop.
+
+### Post-Layout Analysis
+
+![Post-Layout Transient Waveform](pvt_transient_output_waveform.png)
+
+Post-layout simulation was used to evaluate the effect of extracted parasitic capacitances on circuit behavior.
+
+## PVT Characterization
+
+### Clock-to-Q Delay
+
+![Clock-to-Q Delay vs VDD and Temperature](clock_to_q_delay_vs_vdd_temperature.png)
+
+Clock-to-Q delay was characterized across supply voltage and temperature corners. Delay increases significantly at very low supply voltage, particularly at elevated temperatures, due to reduced transistor drive strength.
+
+### Output Voltage Swing
+
+![Maximum Output Voltage](vout_max_vs_vdd_temperature.png)
+
+![Minimum Output Voltage](vout_min_vs_vdd_temperature.png)
+
+Output voltage swing was evaluated across the PVT range. Reduced supply voltage affects the ability of the dynamic circuit to achieve full logic levels, influencing noise margins and cascading reliability.
 
 ## Parasitic and Noise Analysis
 
-Post-layout extraction revealed additional capacitance at internal dynamic nodes, with the output node exhibiting the highest parasitic loading (~0.508 fF). Such capacitances increase effective switching load and degrade timing performance, particularly in near-threshold operation where transistor drive strength is limited.
+### Extracted Parasitics
 
-Qualitative noise analysis indicates:
+![Extracted Parasitic Capacitances](extracted_parasitic_capacitances.png)
 
-* **Low-frequency region:** Flicker (1/f) noise dominates due to carrier trapping effects.
-* **Mid-frequency region:** Thermal noise from channel conduction and interconnect resistance becomes significant.
-* **High-frequency region:** Clock feedthrough, charge injection, and parasitic filtering influence spectral behaviour.
+Post-layout extraction revealed additional capacitance at internal dynamic nodes, with the output node exhibiting approximately **0.508 fF** of parasitic capacitance.
 
-Reduced supply voltage operation lowers noise margins, making the circuit more susceptible to transient disturbances such as undershoot and overshoot. Design mitigation strategies include layout shielding of sensitive nodes, transistor sizing optimisation, weak keeper insertion, and clock edge control.
+These parasitics increase the effective switching load and contribute to timing degradation, particularly under near-threshold operation.
 
----
+### Noise Analysis
 
-## Timing Performance (Clock-to-Q Delay)
+![Output Noise Spectrum](output_noise_spectrum.png)
 
-Propagation delay shows strong dependence on supply voltage scaling:
+The output noise spectrum was analyzed to understand the frequency-dependent noise behavior of the circuit.
 
-* Significant delay degradation observed near **0.25 V**, especially at elevated temperatures.
-* Delay reduces sharply as supply voltage increases toward **0.4 V**, due to improved transistor overdrive and regeneration strength.
-* Beyond this region, delay improvement becomes gradual, indicating a transition from near-threshold to moderate inversion operation.
+The analysis considered:
 
-Temperature increase leads to mobility reduction and higher delay, while low-temperature operation improves switching speed but cannot fully compensate for reduced drive current at very low supply voltages.
+- Low-frequency flicker noise
+- Mid-frequency thermal noise
+- High-frequency effects associated with clock feedthrough, charge injection, and parasitic filtering
 
-These results highlight the existence of a **minimum safe operating voltage** for reliable high-speed operation.
+Reduced supply voltage also decreases noise margins, increasing sensitivity to transient disturbances.
 
----
+## Power–Delay Trade-off
 
-## Output Voltage Swing and Noise Margin
+Supply voltage scaling provides significant power reduction but introduces performance and reliability trade-offs.
 
-Output voltage swing reduces with aggressive supply scaling:
+Lower supply voltages result in:
 
-* Logic-high level degradation occurs due to insufficient pull-up strength within the evaluation window.
-* Logic-low-level exhibits undershoot caused by charge sharing and capacitive coupling.
-* Reduced swing directly impacts noise margins and cascading reliability.
+- Reduced dynamic power
+- Increased propagation delay
+- Slower output transitions
+- Reduced output swing
+- Lower noise margins
 
-Temperature variations further influence switching completeness due to leakage increase and mobility degradation.
+The results indicate an operating region where power savings can be achieved without excessive degradation in timing and signal integrity.
 
----
+## Key Observations
 
-## Power Consumption and Power–Delay Trade-off
+- Dynamic sequential circuits are highly sensitive to parasitic loading and supply voltage.
+- Near-threshold operation can reduce power consumption but introduces significant timing and noise challenges.
+- Layout parasitics become increasingly important as supply voltage is reduced.
+- Careful transistor sizing, routing, and dynamic-node management are important for reliable TSPC operation.
+- Full-custom post-layout analysis provides a more realistic assessment of circuit performance than schematic-level simulation alone.
 
-Dynamic power consumption reduces significantly with supply voltage scaling, consistent with the quadratic dependence of switching power on VDD.
+## Tools & Technologies
 
-However, reduced supply voltage results in:
-
-* Increased propagation delay
-* Slower output transitions
-* Reduced noise margins
-
-An **optimal operating region** exists where meaningful power savings can be achieved without excessive performance degradation. This trade-off is critical in ultra-low power synchronous system design.
-
----
-
-## Key Takeaways
-
-* Dynamic logic circuits exhibit strong sensitivity to parasitic loading and supply scaling.
-* Near-threshold operation enables substantial power savings but introduces timing and noise reliability challenges.
-* Proper layout optimisation and transistor sizing are essential for robust low-voltage operation.
-* TSPC flip-flops remain viable for energy-efficient digital systems when designed within safe operating margins.
-
----
-
-## Tools Used
-
-* LTspice — schematic design and transient verification
-* Electric VLSI — layout implementation and parasitic extraction
-
----
+- **LTspice** — transistor-level circuit simulation and analysis
+- **Electric VLSI** — full-custom schematic/layout implementation and parasitic extraction
+- **45 nm CMOS device models** — transistor-level design and characterization
 
 ## Project Files
 
-* Layout and schematic images
-* Post-layout waveform plots
-* Timing and power measurement data
-* tspc_pvt_testbench.sp
----
+The repository includes:
+
+- LTspice/SPICE simulation files
+- Electric VLSI library files
+- PVT testbench
+- CMOS schematic
+- Full-custom layout
+- Functional and post-layout waveforms
+- Timing, output-swing, parasitic, and noise analysis results
 
 ## Future Improvements
 
-* Monte Carlo variability analysis
-* Keeper optimisation for dynamic node stability
-* Comparison with alternative dynamic flip-flop architectures
-* Integration into larger sequential logic blocks
+Potential extensions include:
 
----
+- Monte Carlo variability analysis
+- Dynamic-node keeper optimization
+- Further transistor sizing optimization
+- Comparison with alternative sequential circuit architectures
+- Integration into larger sequential logic blocks
+
+## Project Context
+
+**VLSI Design Project**  
+45 nm CMOS  
+Transistor-Level Design → Full-Custom Layout → Parasitic Extraction → Post-Layout Simulation → PVT Characterization
