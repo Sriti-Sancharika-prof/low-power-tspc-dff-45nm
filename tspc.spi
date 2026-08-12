@@ -1,0 +1,42 @@
+*** SPICE deck for cell tspc{sch} from library tspcdff
+*** Created on Fri Nov 14, 2025 11:11:20
+*** Last revised on Wed Mar 04, 2026 14:23:03
+*** Written on Wed Mar 04, 2026 14:24:22 by Electric VLSI Design System, version 9.07
+*** Layout tech: mocmos, foundry MOSIS
+*** UC SPICE *** , MIN_RESIST 4.0, MIN_CAPAC 0.1FF
+
+.global gnd vdd
+
+*** TOP LEVEL CELL: tspc{sch}
+Mnmos@1 net@39 D gnd gnd nmos L=45nm W=0.9um
+Mnmos@2 net@20 net@39 net@6 gnd nmos L=45nm W=0.9um
+Mnmos@3 net@6 CLK gnd gnd nmos L=45nm W=0.9um
+Mnmos@4 net@17 CLK net@10 gnd nmos L=45nm W=0.9um
+Mnmos@5 net@10 net@20 gnd gnd nmos L=45nm W=0.9um
+Mnmos@6 OUT net@17 gnd gnd nmos L=45nm W=0.45um
+Mpmos@0 vdd D net@55 vdd pmos L=45nm W=0.9um
+Mpmos@1 vdd CLK net@20 vdd pmos L=45nm W=0.9um
+Mpmos@2 vdd net@20 net@17 vdd pmos L=45nm W=0.9um
+Mpmos@3 vdd net@17 OUT vdd pmos L=45nm W=0.9um
+Mpmos@4 net@55 CLK net@39 vdd pmos L=45nm W=0.9um
+
+* Spice Code nodes in cell cell 'tspc{sch}'
+.param SUPPLY=1.0
+VDD VDD 0 DC {SUPPLY}
+V1 CLK 0 PULSE(0 {SUPPLY} 0 10p 10p 50n 100n)
+V2 D   0 PULSE(0 {SUPPLY} 50n 10p 10p 100n 200n)
+.meas TRAN tpdr  TRIG V(D) VAL={SUPPLY/2} FALL=1  TARG V(OUT) VAL={SUPPLY/2} RISE=1
+.meas TRAN tpdf  TRIG V(D) VAL={SUPPLY/2} RISE=1   TARG V(OUT) VAL={SUPPLY/2} FALL=1
+.meas TRAN tpd   PARAM=((tpdr + tpdf) / 2)
+.meas TRAN tr_10_90 TRIG V(OUT) VAL={0.1*SUPPLY} RISE=1 TARG V(OUT) VAL={0.9*SUPPLY} RISE=1
+.meas TRAN tf_90_10 TRIG V(OUT) VAL={0.9*SUPPLY} FALL=1 TARG V(OUT) VAL={0.1*SUPPLY} FALL=1
+.meas TRAN Vout_max MAX V(OUT)
+.meas TRAN Vout_min MIN V(OUT)
+.meas TRAN Iavg AVG I(VDD) FROM=0 TO=2u
+.meas TRAN Pavg PARAM=(abs(Iavg*SUPPLY))
+;op
+.include D:\Electric\45nmHP.txt
+;noise V{OUT} V2 oct 100 100 10Meg
+.tran 0 2u 0 1n
+.end
+.END
